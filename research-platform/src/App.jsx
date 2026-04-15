@@ -457,6 +457,22 @@ function SearchBarPage({ onSearch, searching, defaultTopics }) {
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
+export default function App() {
+  useEffect(()=>{ injectStyles(); },[]);
+
+  const [user,       setUser]       = useState(null);
+  const [view,       setView]       = useState("search"); // "search" | "dashboard"
+  const [tab,        setTab]        = useState("overview");
+  const [searching,  setSearching]  = useState(false);
+  const [data,       setData]       = useState(null);
+  const [query,      setQuery]      = useState("");
+  const [aiQuery,    setAiQuery]    = useState("");   // the query that produced current data
+
+  const defaultTopics = useMemo(()=> shuffle(TOPICS).slice(0,6), []);
+
+  const handleLogin = (u) => { setUser(u); };
+
+
   // Auth check on mount
   useEffect(() => {
     const token = localStorage.getItem("riq_token");
