@@ -28,6 +28,7 @@ services:
       - MLFLOW_TRACKING_URI=http://mlflow:5000
     volumes:
       - ./backend/chroma_data:/app/chroma_data
+      - ./backend/users.json:/app/users.json
     depends_on:
       - mlflow
     restart: always
@@ -36,9 +37,9 @@ services:
     build:
       context: ./research-platform
       args:
-        - VITE_BACKEND_URL=http://localhost:8000
+        - VITE_BACKEND_URL=${VITE_BACKEND_URL}
     ports:
-      - "80:80"
+      - "3000:80"
     depends_on:
       - backend
     restart: always
