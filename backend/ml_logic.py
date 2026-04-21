@@ -8,7 +8,7 @@ import os
 import time
 
 # Set MLflow tracking URI from environment or default to local sqlite
-MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "sqlite:///mlflow.db")
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "sqlite:///local_mock_mlflow.db")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 mlflow.set_experiment("ResearchIQ_Predictions")
 

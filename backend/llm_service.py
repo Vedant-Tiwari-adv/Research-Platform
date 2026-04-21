@@ -1,18 +1,20 @@
 import os
 import json
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+
+# Force load the .env file if it exists
+dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
+load_dotenv(dotenv_path)
 
 # Configure the Gemini API if the key is available
 api_key = os.environ.get("GEMINI_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 
-DUMMY_MODE = False
-
-# Load the local embedding model
 # all-MiniLM-L6-v2 is small, fast, and generates 384-dimensional embeddings
 try:
+    from sentence_transformers import SentenceTransformer
     embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
 except Exception as e:
     print(f"Warning: Could not load sentence-transformers. Ensure dependencies are installed. {e}")

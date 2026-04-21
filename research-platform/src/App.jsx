@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   AreaChart, Area, LineChart, Line, Legend,
@@ -8,7 +8,7 @@ import {
 } from "recharts";
 
 // ─── GEMINI DIRECT CALL ───────────────────────────────────────────────────────
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:8000";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://127.0.0.1:8000";
 
 
 
@@ -396,6 +396,38 @@ function LoginPage({ onLogin }) {
 function SearchBarPage({ onSearch, searching, defaultTopics }) {
   const [query, setQuery] = useState("");
   const [mode,  setMode]  = useState("semantic");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const token = localStorage.getItem("riq_token");
+      const res = await fetch(`${BACKEND_URL}/api/upload`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok) alert("🎉 " + data.message);
+      else alert(`Upload failed: ${data.detail}`);
+    } catch (err) {
+      alert("Error uploading dataset.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   return (
     <div style={{ maxWidth:740, margin:"0 auto", padding:"52px 24px 40px" }}>
@@ -408,9 +440,15 @@ function SearchBarPage({ onSearch, searching, defaultTopics }) {
         <h1 style={{ fontFamily:"'DM Serif Display',serif", fontSize:44, color:"var(--text)", lineHeight:1.15, marginBottom:14 }}>
           Discover research,<br /><em className="gradient-text">intelligently.</em>
         </h1>
-        <p style={{ fontSize:16, color:"var(--text2)", maxWidth:460, margin:"0 auto" }}>
+        <p style={{ fontSize:16, color:"var(--text2)", maxWidth:460, margin:"0 auto", marginBottom: 24 }}>
           Semantic vector search + real-time AI analysis via Gemini. Type any topic and get live insights.
         </p>
+
+        {/* Upload Dataset Button */}
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".csv" style={{ display: "none" }} />
+        <button className="btn btn-ghost" onClick={handleUploadClick} disabled={uploading}>
+          {uploading ? <><span className="spin-blue" /> Uploading...</> : "📤 Upload Dataset (.csv)"}
+        </button>
       </div>
 
       {/* Mode tabs */}
